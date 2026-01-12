@@ -1,0 +1,195 @@
+:root{
+  --primary-500: #06b6d4; /* cyan/teal */
+  --primary-600: #0891b2;
+  --accent-500: #06b6d4;
+  --bg-soft: #f8fafc;
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --success: #059669;
+  --danger: #dc2626;
+}
+
+/* Page wrappers */
+.pharmacy-page, .consultation-page {
+  background: var(--bg-soft);
+  min-height: 100vh;
+  padding-bottom: 2.5rem;
+}
+
+/* Header gradient tweaks */
+.page-hero {
+  background: linear-gradient(90deg, #06b6d4 0%, #14b8a6 50%, #7c3aed 100%);
+  padding: 2rem 1.5rem;
+  border-bottom-left-radius: 1.25rem;
+  border-bottom-right-radius: 1.25rem;
+  color: white;
+  box-shadow: 0 8px 30px rgba(12, 74, 100, 0.08);
+}
+
+/* Cards */
+.page-card {
+  background: var(--card-bg);
+  border-radius: 0.9rem;
+  padding: 1.25rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border-left: 4px solid transparent;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.page-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.08); }
+
+/* Pharmacy / Professional list items */
+.card-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  background: linear-gradient(135deg,#e6fffa,#ecfeff);
+}
+.card-body { flex: 1; min-width: 0; }
+.card-title { font-weight: 600; color: #0f172a; }
+.card-sub { font-size: 0.875rem; color: var(--muted); }
+
+/* Badges */
+.badge {
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+  padding:0.2rem 0.45rem;
+  border-radius:999px;
+  font-size:0.7rem;
+  font-weight:600;
+}
+.badge-guard { background:#fffbeb; color:#92400e; border:1px solid rgba(245,158,11,0.08); }
+.badge-premium { background:#7c3aed; color:white; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary-500);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  transition: background .12s ease, transform .06s ease;
+}
+.btn-primary:hover { background: var(--primary-600); transform: translateY(-1px); }
+.btn-disabled { background: #e6e6e6; color: #9ca3af; cursor: not-allowed; }
+
+/* Search input style override */
+.search-input {
+  width:100%;
+  padding:0.75rem 1rem;
+  border-radius:0.9rem;
+  border:1px solid rgba(15,23,42,0.06);
+  background: white;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.search-input:focus { outline: none; box-shadow: 0 6px 18px rgba(6,182,212,0.08); border-color: var(--primary-500); }
+
+/* Mode tab buttons (Consultation modes) */
+.mode-button {
+  background: white;
+  color: #374151;
+  border: 1px solid rgba(15,23,42,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.mode-button:hover { box-shadow: 0 6px 18px rgba(6,182,212,0.04); }
+.mode-button.active {
+  background: var(--primary-500);
+  color: white;
+  box-shadow: 0 8px 24px rgba(6,182,212,0.12);
+}
+
+/* Avatar styling for professionals */
+.card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  background: linear-gradient(135deg,#eef2ff,#ecfeff);
+  border: 1px solid rgba(15,23,42,0.04);
+}
+
+/* Avatar wrapper to show colored rings by mode and availability */
+.avatar-wrap { width:80px; height:80px; border-radius:0.8rem; display:flex; align-items:center; justify-content:center; padding:6px; box-sizing:border-box }
+.card-avatar-img { width:100%; height:100%; border-radius:0.6rem; object-fit:cover; display:block; box-shadow: 0 6px 18px rgba(2,6,23,0.08); border: 2px solid white }
+.avatar-initials { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:800; color:white; font-size:1.15rem; border-radius:0.6rem }
+
+/* mode colors (border/ring color when available) - stronger, more visible */
+.avatar-wrap.enLigne.available { box-shadow: 0 0 0 5px rgba(6,182,212,0.18); background: linear-gradient(135deg,#e6fffa,#ecfeff); }
+.avatar-wrap.domicile.available { box-shadow: 0 0 0 5px rgba(250,204,21,0.18); background: linear-gradient(135deg,#fff7ed,#fffbeb); }
+.avatar-wrap.cabinet.available { box-shadow: 0 0 0 5px rgba(124,58,237,0.18); background: linear-gradient(135deg,#f5f3ff,#eef2ff); }
+.avatar-wrap.professionnelDuMetier.available { box-shadow: 0 0 0 5px rgba(16,185,129,0.18); background: linear-gradient(135deg,#ecfdf5,#f0fdf4); }
+.avatar-wrap.pharmacie { box-shadow: 0 0 0 5px rgba(239,68,68,0.18); background: linear-gradient(135deg,#fef2f2,#fee2e2); }
+.avatar-wrap.pharmacie.oncall { box-shadow: 0 0 0 6px rgba(220,38,38,0.25); }
+
+/* premium highlight */
+.avatar-wrap.premium.available { box-shadow: 0 0 0 6px rgba(124,58,237,0.22); }
+
+/* unavailable state */
+.avatar-wrap.enLigne.unavailable,
+.avatar-wrap.domicile.unavailable,
+.avatar-wrap.cabinet.unavailable,
+.avatar-wrap.professionnelDuMetier.unavailable {
+  box-shadow: none; background: #f3f4f6; filter: grayscale(60%); opacity:0.9; border: 1px solid rgba(15,23,42,0.04);
+}
+
+
+/* Ensure search icon spacing works when using absolute icon */
+.search-input.pl-10 { padding-left: 2.75rem; }
+
+/* Small helpers */
+.muted-xs { font-size:0.8rem; color:var(--muted); }
+.card-note { font-size:0.85rem; color:#334155; }
+
+/* Responsive: grid for larger screens */
+@media (min-width: 1024px) {
+  .pharmacy-grid { display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; }
+  .consultation-grid { display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; }
+}
+
+/* Modal styles used by CallModal and BookingModal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,6,23,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 1rem;
+}
+.modal-card {
+  width: 100%;
+  max-width: 720px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 50px rgba(2,6,23,0.3);
+  overflow: hidden;
+}
+.modal-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(15,23,42,0.04);
+}
+.modal-header h3 { margin:0; font-size:1.05rem; }
+.modal-close { background:transparent; border:0; font-size:1.2rem; cursor:pointer }
+.modal-body { padding: 1rem 1.25rem 1.5rem; }
+.prof-line { display:flex; gap:0.75rem; align-items:center }
+.modal-action { flex:1; display:flex; gap:0.5rem; align-items:center; justify-content:center; padding:0.6rem 0.8rem; border-radius:0.6rem; background:var(--primary-500); color:white; border:0; cursor:pointer }
+.modal-action:hover { background:var(--primary-600) }
+
+.file-previews { margin-top: 0.5rem; }
+.preview-card { position:relative; border-radius:0.5rem; overflow:hidden; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:72px }
+.preview-img { width:100%; height:100%; object-fit:cover }
+.preview-doc { display:flex; flex-direction:column; align-items:center; gap:0.25rem; color:var(--muted) }
+.remove-file { position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.5); color:white; border:0; padding:4px 6px; border-radius:6px; font-size:0.7rem; cursor:pointer }
