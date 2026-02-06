@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Get user's appointments
+// Obtenir les rendez-vous de l'utilisateur
 router.get('/', auth, async (req, res) => {
   try {
     const appointments = await Appointment.find({ user: req.user._id })
@@ -19,18 +19,18 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Create appointment
+// Créer un rendez-vous
 router.post('/', auth, async (req, res) => {
   try {
     const { professionalId, date, time, type, notes } = req.body;
 
-    // Check if professional exists and is available
+    // Vérifier si le professionnel existe et est disponible
     const professional = await Professional.findById(professionalId);
     if (!professional) {
       return res.status(404).json({ message: 'Professional not found' });
     }
 
-    // Check if slot is available (simplified)
+    // Vérifier si le créneau est disponible (simplifié)
     const existingAppointment = await Appointment.findOne({
       professional: professionalId,
       date,
@@ -42,12 +42,12 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ message: 'Time slot not available' });
     }
 
-    // Check user balance
+    // Vérifier le solde de l'utilisateur
     if (req.user.walletBalance < professional.consultationFee) {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    // Create appointment
+    // Créer le rendez-vous
     const appointment = new Appointment({
       user: req.user._id,
       professional: professionalId,
@@ -60,7 +60,7 @@ router.post('/', auth, async (req, res) => {
 
     await appointment.save();
 
-    // Deduct from wallet (hold for payment)
+    // Déduire du portefeuille (retenue pour paiement)
     await require('../models/User').findByIdAndUpdate(req.user._id, {
       $inc: { walletBalance: -professional.consultationFee }
     });
@@ -78,7 +78,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Update appointment
+// Mettre à jour le rendez-vous
 router.put('/:id', auth, async (req, res) => {
   try {
     const { status, notes, confirmPayment } = req.body;
@@ -91,20 +91,20 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    // Update fields
+    // Mettre à jour les champs
     if (status) appointment.status = status;
     if (notes !== undefined) appointment.notes = notes;
 
-    // Handle payment confirmation
+    // Gérer la confirmation du paiement
     if (confirmPayment && status === 'completed' && !appointment.isPaid) {
       appointment.isPaid = true;
 
-      // Credit the professional's wallet
+      // Créditer le portefeuille du professionnel
       await require('../models/Professional').findByIdAndUpdate(appointment.professional._id, {
         $inc: { walletBalance: appointment.consultationFee }
       });
 
-      // Create transaction record for the payment
+      // Créer un enregistrement de transaction pour le paiement
       const Transaction = require('../models/Transaction');
       const transaction = new Transaction({
         user: req.user._id,
@@ -119,7 +119,7 @@ router.put('/:id', auth, async (req, res) => {
 
     await appointment.save();
 
-    // If cancelled before payment, refund
+    // Si annulé avant paiement, rembourser
     if (status === 'cancelled' && !appointment.isPaid) {
       await require('../models/User').findByIdAndUpdate(req.user._id, {
         $inc: { walletBalance: appointment.consultationFee }
@@ -136,7 +136,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Get appointment by ID
+// Obtenir un rendez-vous par ID
 router.get('/:id', auth, async (req, res) => {
   try {
     const appointment = await Appointment.findOne({

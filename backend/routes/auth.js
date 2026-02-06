@@ -6,12 +6,12 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Register user
+// Inscrire l'utilisateur
 router.post('/register', async (req, res) => {
   try {
     const { nom, prenom, telephone, profession, email, password } = req.body;
 
-    // Check if user already exists
+    // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
       $or: [
         { telephone },
@@ -23,11 +23,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
+    // Hacher le mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // Créer l'utilisateur
     const user = new User({
       nom,
       prenom,
@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
 
     await user.save();
 
-    // Generate token
+    // Générer le jeton
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
@@ -64,12 +64,12 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login user
+// Connecter l'utilisateur
 router.post('/login', async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
-    // Find user by email or phone
+    // Trouver l'utilisateur par email ou téléphone
     const user = await User.findOne({
       $or: [
         { email: identifier },
@@ -81,13 +81,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check password
+    // Vérifier le mot de passe
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Generate token
+    // Générer le jeton d'authentification pour l'utilisateur connecté
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
@@ -112,7 +112,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get current user
+// Obtenir l'utilisateur actuel
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -123,7 +123,7 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// Refresh token
+// Rafraîchir le jeton
 router.post('/refresh', auth, async (req, res) => {
   try {
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {

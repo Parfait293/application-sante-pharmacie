@@ -26,7 +26,7 @@ const notificationSchema = new mongoose.Schema({
     default: false
   },
   data: {
-    type: mongoose.Schema.Types.Mixed // Additional data for the notification
+    type: mongoose.Schema.Types.Mixed // Données additionnelles pour la notification
   },
   createdAt: {
     type: Date,

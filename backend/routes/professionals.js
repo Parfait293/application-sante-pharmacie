@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Middleware to check if user is a professional (simplified)
+// Middleware pour vérifier si l'utilisateur est un professionnel (simplifié)
 const requireProfessional = async (req, res, next) => {
   try {
     const professional = await Professional.findOne({ email: req.user.email });
@@ -19,7 +19,7 @@ const requireProfessional = async (req, res, next) => {
   }
 };
 
-// Get professional profile and wallet
+// Obtenir le profil et le portefeuille du professionnel
 router.get('/profile', auth, requireProfessional, async (req, res) => {
   try {
     res.json({
@@ -32,12 +32,12 @@ router.get('/profile', auth, requireProfessional, async (req, res) => {
   }
 });
 
-// Get professional's earnings/transactions
+// Obtenir les gains/transactions du professionnel
 router.get('/transactions', auth, requireProfessional, async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
 
-    // Find transactions related to this professional's appointments
+    // Trouver les transactions liées aux rendez-vous de ce professionnel
     const transactions = await Transaction.find({
       type: 'consultation',
       'metadata.appointmentId': { $exists: true }
@@ -50,12 +50,12 @@ router.get('/transactions', auth, requireProfessional, async (req, res) => {
     .limit(limit * 1)
     .skip((page - 1) * limit);
 
-    // Filter transactions for this professional
+    // Filtrer les transactions pour ce professionnel
     const professionalTransactions = transactions.filter(t =>
       t.metadata?.appointmentId?.professional?._id.toString() === req.professional._id.toString()
     );
 
-    // Convert to positive amounts for earnings
+    // Convertir en montants positifs pour les gains
     const earnings = professionalTransactions.map(t => ({
       ...t.toObject(),
       amount: Math.abs(t.amount) // Show as positive for earnings
@@ -71,7 +71,7 @@ router.get('/transactions', auth, requireProfessional, async (req, res) => {
   }
 });
 
-// Withdraw earnings (simplified - would integrate with banking API)
+// Retirer les gains (simplifié - serait intégré avec l'API bancaire)
 router.post('/withdraw', auth, requireProfessional, async (req, res) => {
   try {
     const { amount, bankDetails } = req.body;
@@ -80,9 +80,9 @@ router.post('/withdraw', auth, requireProfessional, async (req, res) => {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    // Create withdrawal transaction
+    // Créer une transaction de retrait
     const transaction = new Transaction({
-      user: req.professional._id, // Using professional ID as user for tracking
+      user: req.professional._id, // Utiliser l'ID du professionnel comme utilisateur pour le suivi
       type: 'withdrawal',
       amount: -amount,
       status: 'pending',
@@ -92,7 +92,7 @@ router.post('/withdraw', auth, requireProfessional, async (req, res) => {
 
     await transaction.save();
 
-    // Deduct from professional wallet
+    // Déduire du portefeuille du professionnel
     await Professional.findByIdAndUpdate(req.professional._id, {
       $inc: { walletBalance: -amount }
     });
@@ -107,7 +107,7 @@ router.post('/withdraw', auth, requireProfessional, async (req, res) => {
   }
 });
 
-// Get professional's appointments with payment status
+// Obtenir les rendez-vous du professionnel avec le statut de paiement
 router.get('/appointments', auth, requireProfessional, async (req, res) => {
   try {
     const Appointment = require('../models/Appointment');

@@ -37,7 +37,7 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
 
   const filteredProfessionals = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    // If user typed a search query, search across all professionals (ignoring availability)
+    // Si l'utilisateur a tapé une requête de recherche, chercher dans tous les professionnels (ignorant la disponibilité)
     if (q !== '') {
       return [...DUMMY_PROFESSIONALS]
         .filter(prof => {
@@ -48,7 +48,7 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
         .sort((a, b) => (a.isPremium === b.isPremium ? 0 : a.isPremium ? -1 : 1));
     }
 
-    // By default (no search query) show only professionals currently available for the selected mode
+    // Par défaut (pas de requête de recherche) afficher uniquement les professionnels actuellement disponibles pour le mode sélectionné
     return [...DUMMY_PROFESSIONALS]
       .filter(prof => {
         const matchesSpecialty = selectedSpecialty === 'Toutes' || prof.specialty === selectedSpecialty;
@@ -70,7 +70,7 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
     }
 
     setSelectedProfessional(prof);
-    // Open the appropriate modal depending on mode
+    // Ouvrir la modale appropriée selon le mode
     if (selectedMode === 'enLigne') {
       setIsCallModalOpen(true);
     } else {
@@ -82,12 +82,12 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
     setTimeout(() => {
       const confirmed = window.confirm('La consultation est terminée ? Confirmez pour débloquer le paiement.');
       if (confirmed) {
-        // simulate release of funds
+        // simuler la libération des fonds
         if (selectedProfessional) {
           const key = String(selectedProfessional.id);
           const hold = lockedHolds[key] ?? 0;
           if (hold > 0) {
-            // release: in real app transfer to professional; here we remove lock
+            // libération : dans une vraie application transférer au professionnel ; ici nous supprimons le blocage
             setLockedHolds(prev => { const c = { ...prev }; delete c[key]; return c; });
             setNotifications(prev => [`Paiement de ${hold} FCFA envoyé à ${selectedProfessional.name}.`, ...prev]);
             alert(`Paiement transféré à ${selectedProfessional?.name ?? 'le professionnel'}.`);
@@ -143,38 +143,38 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
       >
         <div className={`avatar-wrap ${selectedMode} ${prof.available ? 'available' : 'unavailable'} ${prof.isPremium ? 'premium' : ''}`}>
           {prof.imageUrl ? (
-            // image may have transparent background; we keep a colored ring on wrapper
+            // l'image peut avoir un fond transparent ; nous gardons un anneau coloré sur le wrapper
             <img src={prof.imageUrl} alt={prof.name} className="card-avatar-img" />
           ) : (
             <div className="avatar-initials">{prof.name?.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase()}</div>
           )}
         </div>
         <div className="flex-1 text-left">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <div>
               <div className="font-semibold text-gray-800">{prof.name}</div>
-              <div className="text-sm text-gray-500">{prof.specialty} • {prof.clinicName}</div>
+              <div className="text-gray-500 text-sm">{prof.specialty} • {prof.clinicName}</div>
               {prof.schedule && prof.schedule.length > 0 && (
-                <div className="text-xs text-gray-500 mt-1">Horaire: {prof.schedule.slice(0,2).join(' • ')}</div>
+                <div className="mt-1 text-gray-500 text-xs">Horaire: {prof.schedule.slice(0,2).join(' • ')}</div>
               )}
               {prof.clinics && prof.clinics.length > 0 && (
-                <div className="mt-2 flex gap-2 flex-wrap">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {prof.clinics.slice(0,2).map(c => (
-                    <span key={c.id} className="px-2 py-0.5 bg-gray-100 text-xs rounded">{c.name}</span>
+                    <span key={c.id} className="bg-gray-100 px-2 py-0.5 rounded text-xs">{c.name}</span>
                   ))}
                 </div>
               )}
             </div>
-            <div className="text-xs text-gray-500">{prof.rating} <Star className="inline w-3 h-3" /></div>
+            <div className="text-gray-500 text-xs">{prof.rating} <Star className="inline w-3 h-3" /></div>
           </div>
-          <div className="mt-2 flex items-center gap-3">
-            <div className="text-sm font-medium">{prof.consultationFee.toFixed(2)} FCFA</div>
+          <div className="flex items-center gap-3 mt-2">
+            <div className="font-medium text-sm">{prof.consultationFee.toFixed(2)} FCFA</div>
             <div className={`text-xs ${prof.available ? 'text-teal-600' : 'text-red-500'}`}>• {prof.available ? 'Disponible' : 'Indisponible'}</div>
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-2">
-          {prof.isPremium && <span className="px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">Premium</span>}
+          {prof.isPremium && <span className="bg-purple-600 px-2 py-0.5 rounded-full text-white text-xs">Premium</span>}
           <button
             type="button"
             onClick={(e) => {
@@ -183,7 +183,7 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
                 if (!isLoggedIn) setIsAuthModalOpen(true);
                 else handleProfessionalSelect(prof);
               } else {
-                // If unavailable but user is logged show friendly message
+                // Si indisponible mais utilisateur connecté afficher un message amical
                 if (!isLoggedIn) setIsAuthModalOpen(true);
                 else alert(`${prof.name} est actuellement indisponible pour ce mode.`);
               }
@@ -199,18 +199,18 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
-      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 px-6 pt-8 pb-6 rounded-b-3xl shadow-lg">
-        <div className="flex items-center justify-between">
-          <button onClick={onBack} className="text-white flex items-center gap-2 hover:opacity-80 transition">
+    <div className="bg-gray-50 pb-10 min-h-screen">
+      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 shadow-lg px-6 pt-8 pb-6 rounded-b-3xl">
+        <div className="flex justify-between items-center">
+          <button onClick={onBack} className="flex items-center gap-2 hover:opacity-80 text-white transition">
             <ArrowLeft className="w-5 h-5" /> <span>Retour</span>
           </button>
-          <h1 className="text-white text-2xl font-bold">Consultations</h1>
+          <h1 className="font-bold text-white text-2xl">Consultations</h1>
           <div />
         </div>
       </div>
 
-      <div className="px-6 mt-6 space-y-6">
+      <div className="space-y-6 mt-6 px-6">
         <div className="flex gap-3">
           {([
             { key: 'enLigne', label: 'En Ligne', icon: Phone },
@@ -230,16 +230,16 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
           ))}
         </div>
 
-        <div className="p-4 bg-white rounded-xl shadow">
-          <div className="flex gap-3 items-center">
+        <div className="bg-white shadow p-4 rounded-xl">
+          <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="top-1/2 left-3 absolute w-5 h-5 text-gray-400 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Rechercher par nom ou spécialité..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input pl-10"
+                className="pl-10 search-input"
                 autoFocus={false}
               />
             </div>
@@ -256,12 +256,12 @@ export function ConsultationPage({ onBack, user, onNavigate }: ConsultationPageP
 
           {filteredProfessionals.length === 0 && (
             searchQuery.trim() !== '' ? (
-              <div className="p-4 text-center text-gray-500 border border-dashed rounded-xl">Aucun professionnel trouvé pour votre recherche.</div>
+              <div className="p-4 border border-dashed rounded-xl text-gray-500 text-center">Aucun professionnel trouvé pour votre recherche.</div>
             ) : (
-              <div className="p-4 text-center text-gray-600 border border-dashed rounded-xl">
-                <div className="font-medium mb-2">Aucun professionnel disponible pour ce mode.</div>
-                <div className="text-sm mb-3">Essayez de rechercher un nom ou une spécialité dans la barre ci‑dessus pour trouver d'autres professionnels.</div>
-                <div className="text-xs text-gray-500">Vous pouvez aussi basculer le mode pour voir d'autres disponibilités.</div>
+              <div className="p-4 border border-dashed rounded-xl text-gray-600 text-center">
+                <div className="mb-2 font-medium">Aucun professionnel disponible pour ce mode.</div>
+                <div className="mb-3 text-sm">Essayez de rechercher un nom ou une spécialité dans la barre ci‑dessus pour trouver d'autres professionnels.</div>
+                <div className="text-gray-500 text-xs">Vous pouvez aussi basculer le mode pour voir d'autres disponibilités.</div>
               </div>
             )
           )}

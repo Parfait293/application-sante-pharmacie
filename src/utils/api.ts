@@ -1,14 +1,14 @@
-// API utilities for connecting frontend to backend
+// Utilitaires API pour connecter le frontend au backend
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://192.168.137.5:5000/api';
 
-// Helper function to get auth token
+// Fonction utilitaire pour obtenir le jeton d'authentification
 const getToken = () => localStorage.getItem('token');
 
-// Helper function to make authenticated requests
+// Fonction utilitaire pour faire des requêtes authentifiées
 const authFetch = async (url: string, options: RequestInit = {}) => {
   const token = getToken();
-  // Use Headers so we can safely set values regardless of the incoming headers type
+  // Utiliser Headers pour pouvoir définir les valeurs en toute sécurité quel que soit le type des headers entrants
   const headers = new Headers(options.headers as HeadersInit);
 
   if (!headers.has('Content-Type')) {
@@ -25,7 +25,7 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
   });
 };
 
-// Auth API
+// API d'authentification
 export const authAPI = {
   register: async (userData: any) => {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -64,7 +64,7 @@ export const authAPI = {
   },
 };
 
-// User API
+// API Utilisateur
 export const userAPI = {
   updateProfile: async (userData: any) => {
     const response = await authFetch('/users/profile', {
@@ -91,7 +91,7 @@ export const userAPI = {
   },
 };
 
-// Payment API
+// API de paiement
 export const paymentAPI = {
   // Méthodes de paiement
   addPaymentMethod: async (paymentData: {
@@ -166,7 +166,7 @@ export const paymentAPI = {
   },
 };
 
-// Pharmacy API
+// API Pharmacie
 export const pharmacyAPI = {
   getPharmacies: async (params?: { medicine?: string; lat?: number; lng?: number }) => {
     const query = new URLSearchParams();
@@ -184,7 +184,7 @@ export const pharmacyAPI = {
   },
 };
 
-// Medicine API
+// API Médicaments
 export const medicineAPI = {
   searchMedicines: async (name: string) => {
     const response = await fetch(`${API_BASE_URL}/medicines/search?name=${encodeURIComponent(name)}`);
@@ -192,7 +192,7 @@ export const medicineAPI = {
   },
 };
 
-// Appointment API
+// API Rendez-vous
 export const appointmentAPI = {
   getAppointments: async () => {
     const response = await authFetch('/appointments');
@@ -216,7 +216,7 @@ export const appointmentAPI = {
   },
 };
 
-// Order API
+// API Commande
 export const orderAPI = {
   getOrders: async () => {
     const response = await authFetch('/orders');
@@ -244,7 +244,7 @@ export const orderAPI = {
   },
 };
 
-// Notification API
+// API Notification
 export const notificationAPI = {
   getNotifications: async () => {
     const response = await authFetch('/notifications');
@@ -266,7 +266,7 @@ export const notificationAPI = {
   },
 };
 
-// Professional API
+// API Professionnel
 export const professionalAPI = {
   getProfile: async () => {
     const response = await authFetch('/professionals/profile');
@@ -294,11 +294,32 @@ export const professionalAPI = {
     const response = await authFetch('/professionals/appointments');
     return response.json();
   },
+
+  updateAppointment: async (appointmentId: string, updates: any) => {
+    const response = await authFetch(`/professionals/appointments/${appointmentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+    return response.json();
+  },
+
+  getPatients: async () => {
+    const response = await authFetch('/professionals/patients');
+    return response.json();
+  },
+
+  updateProfile: async (profileData: any) => {
+    const response = await authFetch('/professionals/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+    return response.json();
+  },
 };
 
-// Logout helper
+// Fonction de déconnexion
 export const logout = () => {
   localStorage.removeItem('token');
-  // Redirect to login or refresh page
+  // Rediriger vers la connexion ou rafraîchir la page
   window.location.href = '/';
 };

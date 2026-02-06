@@ -4,10 +4,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables
+// Charger les variables d'environnement
 dotenv.config();
 
-// Import routes
+// Importer les routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const pharmacyRoutes = require('./routes/pharmacies');
@@ -25,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files for uploads
+// Fichiers statiques pour les téléchargements
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -39,12 +39,12 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/professionals', professionalRoutes);
 
-// Health check
+// Vérification de santé
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend is running' });
 });
 
-// Connect to MongoDB
+// Se connecter à MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

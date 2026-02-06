@@ -4,22 +4,22 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Update user profile - accepts JSON with optional base64 photo
+// Mettre à jour le profil de l'utilisateur - accepte JSON avec photo base64 optionnelle
 router.put('/profile', auth, async (req, res) => {
   try {
     const updates = req.body;
     const user = req.user;
 
-    // Handle base64 photo (sent as JSON)
+    // Gérer la photo base64 (envoyée en JSON)
     if (updates.photo && updates.photo.startsWith('data:image')) {
-      // Photo is already in base64 format, use it directly
+      // La photo est déjà au format base64, l'utiliser directement
       updates.photo = updates.photo;
     } else if (updates.photo === null || updates.photo === undefined) {
-      // Don't update photo if not provided
+      // Ne pas mettre à jour la photo si non fournie
       delete updates.photo;
     }
 
-    // Remove fields that shouldn't be updated directly
+    // Supprimer les champs qui ne devraient pas être mis à jour directement
     delete updates.password;
     delete updates.walletBalance;
     delete updates._id;
@@ -41,10 +41,10 @@ router.put('/profile', auth, async (req, res) => {
   }
 });
 
-// Update wallet balance (admin or system only)
+// Mettre à jour le solde du portefeuille (admin ou système uniquement)
 router.put('/wallet', auth, async (req, res) => {
   try {
-    const { amount, operation } = req.body; // operation: 'add' or 'subtract'
+    const { amount, operation } = req.body; // opération : 'add' ou 'subtract'
     const user = req.user;
 
     let newBalance = user.walletBalance;
@@ -73,19 +73,19 @@ router.put('/wallet', auth, async (req, res) => {
   }
 });
 
-// Change password
+// Changer le mot de passe
 router.put('/password', auth, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const user = req.user;
 
-    // Verify current password
+    // Vérifier le mot de passe actuel
     const isMatch = await require('bcryptjs').compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
-    // Hash new password
+    // Hacher le nouveau mot de passe
     const salt = await require('bcryptjs').genSalt(10);
     const hashedPassword = await require('bcryptjs').hash(newPassword, salt);
 
@@ -98,7 +98,7 @@ router.put('/password', auth, async (req, res) => {
   }
 });
 
-// Get user by ID (for admin or public profile)
+// Obtenir l'utilisateur par ID (pour admin ou profil public)
 router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

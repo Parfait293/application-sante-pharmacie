@@ -72,9 +72,9 @@ router.get('/search/:medicine', async (req, res) => {
   }
 });
 
-// Helper function to calculate distance
+// Fonction utilitaire pour calculer la distance
 function calculateDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371; // Radius of the earth in km
+  const R = 6371; // Rayon de la terre en km
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLng = (lng2 - lng1) * Math.PI / 180;
   const a = Math.sin(dLat/2) * Math.sin(dLat/2) +

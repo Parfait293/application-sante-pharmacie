@@ -29,14 +29,14 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371; // Rayon de la terre en km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLng = (lng2 - lng1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLng/2) * Math.sin(dLng/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const d = R * c; // Distance in km
+    const d = R * c; // Distance en km
     return d;
   };
 
@@ -118,24 +118,24 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
     const [localSelectedProf, setLocalSelectedProf] = useState<any>(null);
     const [isLocalBookingOpen, setIsLocalBookingOpen] = useState(false);
 
-    // find professionals that have this clinic in their clinics list
+    // trouver les professionnels qui ont cette clinique dans leur liste de cliniques
     const doctorsAtLocation = DUMMY_PROFESSIONALS.filter(p => (p.clinics || []).some(c => c.name === location.name || c.id === location.id));
 
     return (
-      <div className="w-full bg-white rounded-xl shadow-md p-4 transition border-l-4 border-transparent hover:border-teal-500">
+      <div className="bg-white shadow-md p-4 border-transparent hover:border-teal-500 border-l-4 rounded-xl w-full transition">
         <div className={`avatar-wrap pharmacie ${location.isOnCall ? 'oncall' : ''}`}>
           <div className="avatar-initials">{location.name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase()}</div>
         </div>
         <div className="mt-2">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <div>
-              <div className="font-semibold text-gray-800">{location.name} <span className="text-sm text-gray-500">• {doctorsAtLocation.length} praticien(s)</span></div>
-              <div className="text-sm text-gray-500 flex items-center gap-1">
+              <div className="font-semibold text-gray-800">{location.name} <span className="text-gray-500 text-sm">• {doctorsAtLocation.length} praticien(s)</span></div>
+              <div className="flex items-center gap-1 text-gray-500 text-sm">
                 <MapPin className="w-4 h-4" /> {location.address} • {location.distance} km
               </div>
               <div className="mt-2 text-xs">
                 {doctorsAtLocation.slice(0,2).map(d => (
-                  <div key={d.id} className="inline-block mr-2 px-2 py-0.5 bg-gray-100 rounded text-xs">{d.name} • {d.specialty}</div>
+                  <div key={d.id} className="inline-block bg-gray-100 mr-2 px-2 py-0.5 rounded text-xs">{d.name} • {d.specialty}</div>
                 ))}
               </div>
             </div>
@@ -145,7 +145,7 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
                 • {location.isOnCall ? 'De garde' : 'Ouvert'}
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => callLocation('22812345678')} className="px-3 py-1 rounded-lg text-sm bg-teal-500 text-white"><Phone className="w-4 h-4 inline mr-1" /> Appeler</button>
+                <button type="button" onClick={() => callLocation('22812345678')} className="bg-teal-500 px-3 py-1 rounded-lg text-white text-sm"><Phone className="inline mr-1 w-4 h-4" /> Appeler</button>
                 <button type="button" onClick={() => {
                   let url = `https://maps.google.com/?q=${encodeURIComponent(location.address)}`;
                   if (location.lat && location.lng) {
@@ -156,27 +156,27 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
                     }
                   }
                   window.open(url, '_blank');
-                }} className="px-3 py-1 rounded-lg text-sm bg-blue-500 text-white"><MapPin className="w-4 h-4 inline mr-1" /> Localisation</button>
+                }} className="bg-blue-500 px-3 py-1 rounded-lg text-white text-sm"><MapPin className="inline mr-1 w-4 h-4" /> Localisation</button>
               </div>
             </div>
           </div>
 
           <div className="mt-3">
-            <button type="button" onClick={() => setExpanded(!expanded)} className="text-sm text-teal-600">{expanded ? 'Masquer les praticiens' : 'Voir les praticiens'}</button>
+            <button type="button" onClick={() => setExpanded(!expanded)} className="text-teal-600 text-sm">{expanded ? 'Masquer les praticiens' : 'Voir les praticiens'}</button>
             {expanded && (
-              <div className="mt-3 space-y-3">
+              <div className="space-y-3 mt-3">
                 {doctorsAtLocation.map(doc => (
-                  <div key={doc.id} className="p-3 bg-gray-50 rounded flex items-center justify-between">
+                  <div key={doc.id} className="flex justify-between items-center bg-gray-50 p-3 rounded">
                     <div>
-                      <div className="font-medium">{doc.name} <span className="text-xs text-gray-500">• {doc.specialty}</span></div>
-                      <div className="text-xs text-gray-500">{doc.schedule ? doc.schedule.slice(0,2).join(' • ') : ''}</div>
+                      <div className="font-medium">{doc.name} <span className="text-gray-500 text-xs">• {doc.specialty}</span></div>
+                      <div className="text-gray-500 text-xs">{doc.schedule ? doc.schedule.slice(0,2).join(' • ') : ''}</div>
                     </div>
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => { setLocalSelectedProf(doc); if (!isLoggedIn) setIsAuthModalOpen(true); else { setIsLocalBookingOpen(true); } }} className="px-3 py-1 rounded bg-teal-500 text-white text-sm">Prendre RDV</button>
+                      <button type="button" onClick={() => { setLocalSelectedProf(doc); if (!isLoggedIn) setIsAuthModalOpen(true); else { setIsLocalBookingOpen(true); } }} className="bg-teal-500 px-3 py-1 rounded text-white text-sm">Prendre RDV</button>
                     </div>
                   </div>
                 ))}
-                {doctorsAtLocation.length === 0 && (<div className="text-sm text-gray-500">Aucun praticien référencé pour ce lieu.</div>)}
+                {doctorsAtLocation.length === 0 && (<div className="text-gray-500 text-sm">Aucun praticien référencé pour ce lieu.</div>)}
               </div>
             )}
           </div>
@@ -196,33 +196,33 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
-      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 px-6 pt-8 pb-6 rounded-b-3xl shadow-lg">
-        <div className="flex items-center justify-between">
-          <button onClick={onBack} className="text-white flex items-center gap-2 hover:opacity-80 transition">
+    <div className="bg-gray-50 pb-10 min-h-screen">
+      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 shadow-lg px-6 pt-8 pb-6 rounded-b-3xl">
+        <div className="flex justify-between items-center">
+          <button onClick={onBack} className="flex items-center gap-2 hover:opacity-80 text-white transition">
             <ArrowLeft className="w-5 h-5" /> <span>Retour</span>
           </button>
-          <h1 className="text-white text-2xl font-bold">Pharmacie</h1>
+          <h1 className="font-bold text-white text-2xl">Pharmacie</h1>
           <div />
         </div>
       </div>
 
-      <div className="px-6 mt-6 space-y-6">
-        <div className="p-4 bg-white rounded-xl shadow">
-          <div className="flex gap-3 items-center">
+      <div className="space-y-6 mt-6 px-6">
+        <div className="bg-white shadow p-4 rounded-xl">
+          <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="top-1/2 left-3 absolute w-5 h-5 text-gray-400 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Rechercher un médicament..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && suggestions.length > 0) { setSelectedMedicine(suggestions[0]); setSearchQuery(''); } }}
-                className="search-input pl-10"
+                className="pl-10 search-input"
                 autoFocus={false}
               />
             </div>
-            <button onClick={() => { if (suggestions.length > 0) { setSelectedMedicine(suggestions[0]); setSearchQuery(''); } }} className="px-4 py-2 bg-teal-500 text-white rounded-lg">Rechercher</button>
+            <button onClick={() => { if (suggestions.length > 0) { setSelectedMedicine(suggestions[0]); setSearchQuery(''); } }} className="bg-teal-500 px-4 py-2 rounded-lg text-white">Rechercher</button>
           </div>
           {searchQuery && (
             <div className="mt-3 max-h-40 overflow-y-auto">
@@ -230,7 +230,7 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
                 <button
                   key={med}
                   onClick={() => { setSelectedMedicine(med); setSearchQuery(''); }}
-                  className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                  className="hover:bg-gray-100 p-2 rounded w-full text-left"
                 >
                   {med}
                 </button>
@@ -240,33 +240,33 @@ export function PharmacyPage({ onBack, user, onNavigate }: PharmacyPageProps) {
         </div>
 
         {selectedMedicine && (
-          <div className="p-4 bg-white rounded-xl shadow">
-            <h3 className="font-semibold mb-3">Disponibilité de {selectedMedicine}</h3>
+          <div className="bg-white shadow p-4 rounded-xl">
+            <h3 className="mb-3 font-semibold">Disponibilité de {selectedMedicine}</h3>
             <div className="space-y-3">
               {availableLocations.map(location => <LocationCard key={location.id} location={location} />)}
               {availableLocations.length === 0 && (
-                <div className="p-4 text-center text-gray-500 border border-dashed rounded-xl">Aucun lieu trouvé pour ce médicament.</div>
+                <div className="p-4 border border-dashed rounded-xl text-gray-500 text-center">Aucun lieu trouvé pour ce médicament.</div>
               )}
             </div>
           </div>
         )}
 
-        <div className="p-4 bg-white rounded-xl shadow">
-          <h3 className="font-semibold mb-3">Ajouter une ordonnance</h3>
+        <div className="bg-white shadow p-4 rounded-xl">
+          <h3 className="mb-3 font-semibold">Ajouter une ordonnance</h3>
           <div className="flex gap-3">
             <label className="flex-1">
               <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="hidden" />
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full py-3 border-2 border-dashed border-teal-300 bg-teal-50 text-teal-700 rounded-lg hover:border-teal-500 hover:bg-teal-100 transition flex items-center justify-center gap-2">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="flex justify-center items-center gap-2 bg-teal-50 hover:bg-teal-100 py-3 border-2 border-teal-300 hover:border-teal-500 border-dashed rounded-lg w-full text-teal-700 transition">
                 <Paperclip className="w-5 h-5" /> Joindre fichier
               </button>
             </label>
-            <button onClick={takePhoto} className="flex-1 py-3 bg-teal-500 text-white rounded-lg flex items-center justify-center gap-2">
+            <button onClick={takePhoto} className="flex flex-1 justify-center items-center gap-2 bg-teal-500 py-3 rounded-lg text-white">
               <Camera className="w-5 h-5" /> Prendre photo
             </button>
           </div>
           {uploadedFiles.length > 0 && (
             <div className="mt-3">
-              <p className="text-sm text-gray-600">Fichiers joints:</p>
+              <p className="text-gray-600 text-sm">Fichiers joints:</p>
               <ul className="text-sm">
                 {uploadedFiles.map((f, i) => <li key={i}>{f.name}</li>)}
               </ul>

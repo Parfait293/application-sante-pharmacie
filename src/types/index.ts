@@ -1,6 +1,7 @@
 // Types centralisés pour l'application
 
 export type User = {
+  id: string;
   nom: string;
   prenom: string;
   telephone: string;
@@ -9,6 +10,10 @@ export type User = {
   photo?: string;
   countryCode?: string;
   walletBalance?: number; // Portefeuille électronique
+  role: 'patient' | 'professional' | 'admin';
+  professionalProfile?: Professional; // Si c'est un professionnel
+  createdAt?: string;
+  isActive?: boolean;
 };
 
 export type Appointment = {
@@ -46,7 +51,8 @@ export type Order = {
 };
 
 export type Professional = {
-  id: number;
+  id: string;
+  userId: string; // Référence à l'utilisateur
   name: string;
   clinicName: string;
   specialty: string;
@@ -57,9 +63,13 @@ export type Professional = {
   address: string;
   phone: string;
   consultationFee: number;
-  walletBalance?: number; // Nouveau champ pour le portefeuille
+  walletBalance?: number; // Portefeuille professionnel
   workSchedule: WorkSchedule[];
   autoMessage?: string; // Message automatique si non disponible
+  verified?: boolean; // Vérifié par l'admin
+  licenseNumber?: string; // Numéro de licence
+  experience?: number; // Années d'expérience
+  certifications?: string[]; // Certifications
 };
 
 export type Pharmacy = {
@@ -153,6 +163,52 @@ export const WEST_AFRICA_COUNTRIES = [
   { name: 'Sierra Leone', code: '+232' },
   { name: 'Nigeria', code: '+234' }
 ];
+
+// Types pour l'administration
+export type AdminStats = {
+  totalUsers: number;
+  totalProfessionals: number;
+  totalAppointments: number;
+  totalOrders: number;
+  totalRevenue: number;
+  monthlyGrowth: number;
+};
+
+export type AdminUser = {
+  id: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  email?: string;
+  role: 'patient' | 'professional' | 'admin';
+  isActive: boolean;
+  createdAt: string;
+  lastLogin?: string;
+  professionalProfile?: Professional;
+};
+
+export type AdminAppointment = {
+  id: string;
+  patient: string;
+  professional: string;
+  date: string;
+  time: string;
+  status: 'upcoming' | 'completed' | 'cancelled';
+  consultationFee: number;
+  isPaid: boolean;
+};
+
+export type ProfessionalAppointment = Appointment & {
+  patient: {
+    id: string;
+    name: string;
+    phone: string;
+    email?: string;
+  };
+  notes?: string; // Notes du professionnel
+  prescription?: string; // Ordonnance
+  followUpRequired?: boolean;
+};
 
 // Professions générales (pour les utilisateurs)
 export const USER_PROFESSIONS = [

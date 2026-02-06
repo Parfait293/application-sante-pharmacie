@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Configure multer for prescription uploads
+// Configurer multer pour les téléchargements d'ordonnances
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/prescriptions/');
@@ -32,7 +32,7 @@ const upload = multer({
   }
 });
 
-// Get user's orders
+// Obtenir les commandes de l'utilisateur
 router.get('/', auth, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id })
@@ -46,31 +46,31 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Create order
+// Créer une commande
 router.post('/', auth, upload.single('prescription'), async (req, res) => {
   try {
     const { pharmacyId, medication, quantity, deliveryAddress, notes } = req.body;
 
-    // Check if pharmacy exists
+    // Vérifier si la pharmacie existe
     const pharmacy = await Pharmacy.findById(pharmacyId);
     if (!pharmacy) {
       return res.status(404).json({ message: 'Pharmacy not found' });
     }
 
-    // Check if medicine is available
+    // Vérifier si le médicament est disponible
     if (!pharmacy.availableMedicines.includes(medication)) {
       return res.status(400).json({ message: 'Medicine not available at this pharmacy' });
     }
 
-    // Calculate price (simplified)
+    // Calculer le prix (simplifié)
     const price = 5000 * quantity; // Fixed price per unit
 
-    // Check balance
+    // Vérifier le solde
     if (req.user.walletBalance < price) {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    // Create order
+    // Créer la commande
     const order = new Order({
       user: req.user._id,
       pharmacy: pharmacyId,
@@ -84,7 +84,7 @@ router.post('/', auth, upload.single('prescription'), async (req, res) => {
 
     await order.save();
 
-    // Deduct from wallet
+    // Déduire du portefeuille
     await require('../models/User').findByIdAndUpdate(req.user._id, {
       $inc: { walletBalance: -price }
     });
@@ -101,7 +101,7 @@ router.post('/', auth, upload.single('prescription'), async (req, res) => {
   }
 });
 
-// Update order status
+// Mettre à jour le statut de la commande
 router.put('/:id', auth, async (req, res) => {
   try {
     const { status } = req.body;
@@ -117,7 +117,7 @@ router.put('/:id', auth, async (req, res) => {
     order.status = status;
     await order.save();
 
-    // If cancelled, refund
+    // Si annulé, rembourser
     if (status === 'cancelled' && !order.isPaid) {
       await require('../models/User').findByIdAndUpdate(req.user._id, {
         $inc: { walletBalance: order.price }
@@ -134,7 +134,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Get order by ID
+// Obtenir une commande par ID
 router.get('/:id', auth, async (req, res) => {
   try {
     const order = await Order.findOne({

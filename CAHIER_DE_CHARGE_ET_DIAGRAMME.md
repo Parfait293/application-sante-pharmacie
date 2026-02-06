@@ -1,8 +1,9 @@
  Application Santé Pharmacie - Cahier de Charge et Diagramme de Cas d'Utilisation
 
-**Date :** 11 janvier 2026  
+**Date :** 6 février 2026  
 **Projet :** Application Santé Pharmacie  
-**Type de document :** Cahier de charge technique + Diagramme de cas d'utilisation
+**Type de document :** Cahier de charge technique + Diagramme de cas d'utilisation  
+**Version :** 2.0 (Mise à jour avec interfaces Professionnel et Admin)
 
 ---
 
@@ -103,25 +104,33 @@
   - Mettre à jour son profil
 
 ### 2.3 Professionnel de Santé (Doctor/Specialist)
-- **Description :** Médecin, infirmier, ou autre professionnel de santé
+- **Description :** Médecin, pharmacien, infirmier ou autre professionnel de santé certifié
 - **Droits :**
-  - Tous les droits du Patient
-  - Gérer ses rendez-vous
-  - Consulter les consultations
-  - Accéder à son portefeuille professionnel
-  - Retirer ses gains
-  - Voir les transactions
-  - Gérer sa disponibilité
+  - ✅ **Accès Hybride :** Tous les droits du Patient + fonctionnalités professionnelles
+  - **Tableau de bord professionnel** avec statistiques et vue d'ensemble
+  - **Gestion complète des rendez-vous** (confirmer, annuler, terminer, notes, ordonnances)
+  - **Gestion du portefeuille professionnel** (gains, retraits, historique)
+  - **Profil professionnel enrichi** (spécialité, cabinet, horaires, certifications)
+  - **Accès patient** pour utiliser l'app comme un utilisateur normal
+- **Processus d'inscription :**
+  1. Formulaire d'inscription professionnel en 3 étapes
+  2. Vérification des informations et certifications
+  3. Validation par l'administrateur
+  4. Accès automatique au tableau de bord professionnel
 
 ### 2.4 Administrateur (Admin)
-- **Description :** Gestionnaire de l'application
+- **Description :** Super-administrateur de la plateforme
 - **Droits :**
-  - Accéder au panneau d'administration
-  - Gérer les utilisateurs
-  - Gérer les pharmacies
-  - Gérer les professionnels
-  - Voir les statistiques
-  - Gérer les paiements
+  - **Accès admin sécurisé** par code d'accès
+  - **Tableau de bord administratif** avec statistiques globales
+  - **Gestion des utilisateurs** (activer/désactiver, supprimer, modifier)
+  - **Supervision des professionnels** (validation, vérification)
+  - **Vue d'ensemble de l'application** (utilisateurs, rendez-vous, revenus)
+  - **Gestion des paramètres système**
+- **Processus d'accès :**
+  1. Page d'accès administrateur dédiée
+  2. Saisie du code d'accès sécurisé
+  3. Authentification et redirection vers le dashboard admin
 
 ---
 
@@ -1308,5 +1317,175 @@ L'**Application Santé Pharmacie** est une plateforme mobile/web complète de t�
 
 ---
 
-**Document généré le 11 janvier 2026**  
+## 4. NOUVELLES FONCTIONNALITÉS (VERSION 2.0)
+
+### 4.1 INTERFACE PROFESSIONNEL DE SANTÉ
+
+#### **UC-PRO-1 : Accès Tableau de Bord Professionnel**
+- **Acteur Principal :** Professionnel de Santé
+- **Description :** Accès au dashboard personnalisé avec statistiques
+- **Pré-conditions :** Utilisateur authentifié avec rôle `professional`
+- **Flux Principal :**
+  1. Connexion automatique vers le tableau de bord professionnel
+  2. Affichage des statistiques : RDV du jour, revenus mensuels, patients totaux
+  3. Actions rapides : Gestion RDV, Portefeuille, Vue Patient
+- **Post-conditions :** Vue d'ensemble de l'activité professionnelle
+- **Endpoint API :** `GET /api/professionals/dashboard`
+
+#### **UC-PRO-2 : Gestion des Rendez-vous Professionnels**
+- **Acteur Principal :** Professionnel de Santé
+- **Description :** Gestion complète des rendez-vous reçus
+- **Pré-conditions :** Professionnel connecté
+- **Flux Principal :**
+  1. Consultation de la liste des rendez-vous
+  2. Filtrage par statut (à venir, confirmé, terminé, annulé)
+  3. Actions disponibles :
+     - **Confirmer** un rendez-vous
+     - **Terminer** avec notes et ordonnance
+     - **Annuler** avec motif
+     - **Consulter** les informations patient
+  4. Ajout de notes de consultation
+  5. Prescription d'ordonnances numériques
+- **Post-conditions :** Rendez-vous mis à jour, patient notifié
+- **Endpoint API :** `GET /api/professionals/appointments`, `PUT /api/professionals/appointments/:id`
+
+#### **UC-PRO-3 : Gestion Portefeuille Professionnel**
+- **Acteur Principal :** Professionnel de Santé
+- **Description :** Gestion des gains et retraits
+- **Pré-conditions :** Professionnel connecté
+- **Flux Principal :**
+  1. Vue du solde disponible et des gains totaux
+  2. Historique des transactions détaillé
+  3. Demande de retrait avec coordonnées bancaires
+  4. Validation et traitement des retraits
+- **Post-conditions :** Gains gérés, retraits traités
+- **Endpoint API :** `GET /api/professionals/transactions`, `POST /api/professionals/withdraw`
+
+#### **UC-PRO-4 : Inscription Professionnelle**
+- **Acteur Principal :** Visiteur (professionnel de santé)
+- **Description :** Création de compte professionnel en 3 étapes
+- **Pré-conditions :** Visiteur non inscrit
+- **Flux Principal :**
+  1. **Étape 1** : Informations personnelles (nom, prénom, téléphone, email)
+  2. **Étape 2** : Informations professionnelles (spécialité, cabinet, honoraires, licence)
+  3. **Étape 3** : Sécurité (mot de passe, confirmation)
+  4. Soumission et validation des informations
+  5. Création automatique du profil professionnel
+  6. Redirection vers le tableau de bord
+- **Post-conditions :** Compte professionnel créé, en attente de validation admin
+- **Endpoint API :** `POST /api/auth/professional-register`
+
+### 4.2 INTERFACE ADMINISTRATEUR
+
+#### **UC-ADMIN-1 : Accès Sécurisé Admin**
+- **Acteur Principal :** Administrateur
+- **Description :** Connexion sécurisée au panneau d'administration
+- **Pré-conditions :** Posséder le code d'accès admin
+- **Flux Principal :**
+  1. Accès à la page d'administration dédiée
+  2. Saisie du code d'accès sécurisé
+  3. Validation et authentification
+  4. Redirection vers le dashboard admin
+- **Post-conditions :** Administrateur authentifié
+- **Endpoint API :** `POST /api/auth/admin-login`
+
+#### **UC-ADMIN-2 : Tableau de Bord Administratif**
+- **Acteur Principal :** Administrateur
+- **Description :** Vue d'ensemble de l'application
+- **Pré-conditions :** Administrateur authentifié
+- **Flux Principal :**
+  1. Affichage des statistiques globales :
+     - Total utilisateurs, professionnels, rendez-vous, commandes
+     - Revenus totaux et croissance mensuelle
+  2. Vue des activités récentes :
+     - Nouveaux utilisateurs
+     - Derniers rendez-vous
+  3. Actions rapides vers les modules de gestion
+- **Post-conditions :** Vue complète de l'état de la plateforme
+- **Endpoint API :** `GET /api/admin/stats`, `GET /api/admin/recent-activities`
+
+#### **UC-ADMIN-3 : Gestion des Utilisateurs**
+- **Acteur Principal :** Administrateur
+- **Description :** Administration complète des comptes utilisateurs
+- **Pré-conditions :** Administrateur authentifié
+- **Flux Principal :**
+  1. Liste de tous les utilisateurs avec filtres
+  2. Actions par utilisateur :
+     - **Voir détails** (profil, informations, rôle)
+     - **Activer/Désactiver** le compte
+     - **Supprimer** le compte (avec confirmation)
+     - **Modifier** les informations
+  3. Gestion spécifique des professionnels :
+     - Validation des certifications
+     - Vérification des licences
+     - Activation des comptes professionnels
+- **Post-conditions :** Utilisateurs gérés, plateforme sécurisée
+- **Endpoint API :** `GET /api/admin/users`, `PUT /api/admin/users/:id`, `DELETE /api/admin/users/:id`
+
+---
+
+## 5. ARCHITECTURE TECHNIQUE MISE À JOUR
+
+### 5.1 STACK TECHNOLOGIQUE
+
+**Frontend :**
+- React 18.3.1 avec TypeScript
+- Vite 6.3.5 (build tool)
+- TailwindCSS pour le styling
+- Radix UI pour les composants
+- Capacitor pour le déploiement mobile
+
+**Backend :**
+- Node.js avec Express
+- MongoDB avec Mongoose
+- JWT pour l'authentification
+- Architecture RESTful API
+
+**Nouvelles Interfaces :**
+- `ProfessionalDashboard.tsx` : Tableau de bord professionnel
+- `ProfessionalAppointmentsPage.tsx` : Gestion RDV professionnelle
+- `ProfessionalWalletPage.tsx` : Portefeuille professionnel (existant)
+- `AdminDashboard.tsx` : Tableau de bord administratif
+- `AdminUsersPage.tsx` : Gestion des utilisateurs
+- `ProfessionalSignupPage.tsx` : Inscription professionnelle 3 étapes
+- `AdminAccessPage.tsx` : Accès sécurisé administrateur
+
+### 5.2 MODÈLES DE DONNÉS
+
+**Types étendus :**
+- `User` : Ajout du champ `role` et `professionalProfile`
+- `Professional` : Enrichissement avec `verified`, `licenseNumber`, `experience`
+- `AdminStats`, `AdminUser`, `ProfessionalAppointment` : Nouveaux types
+
+**API Routes :**
+- `/api/auth/*` : Authentification (login, register, admin-access)
+- `/api/professionals/*` : Fonctionnalités professionnelles
+- `/api/admin/*` : Fonctionnalités administratives
+
+### 5.3 NAVIGATION INTELLIGENTE
+
+**Redirection automatique selon le rôle :**
+- `patient` → Page d'accueil utilisateur
+- `professional` → Tableau de bord professionnel
+- `admin` → Tableau de bord administratif
+
+**Accès hybride pour professionnels :**
+- Un professionnel peut utiliser toutes les fonctionnalités patient
+- Basculement entre vue patient et vue professionnelle
+
+---
+
+**Architecture :**
+- Frontend : React + TypeScript + Vite
+- Backend : Node.js + Express + MongoDB
+- Authentification : JWT avec rôles
+- Paiements : Simulation locale + Mobile Money
+- API externe : RxNorm pour médicaments
+- **Nouveau :** Gestion multi-rôles avec interfaces spécialisées
+
+**État :** Application fonctionnelle avec interfaces Patient, Professionnel et Admin complètes. Prête pour déploiement en production.
+
+---
+
+**Document généré le 6 février 2026 (Version 2.0)**  
 **Pour questions ou modifications, veuillez consulter l'équipe de développement**
