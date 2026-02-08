@@ -15,6 +15,7 @@ type HomePageProps = {
   onNavigateToNotifications: () => void;
   onNavigateToWallet: () => void;
   onNavigateToOnDutyPharmacies: () => void;
+  onNavigateToAdminAccess: () => void;
   showAuthPrompt: boolean;
   onAuthPromptClose: () => void;
   appointments: Appointment[];
@@ -32,6 +33,7 @@ export function HomePage({
   onNavigateToNotifications,
   onNavigateToWallet,
   onNavigateToOnDutyPharmacies,
+  onNavigateToAdminAccess,
   showAuthPrompt,
   onAuthPromptClose,
   appointments
@@ -87,55 +89,55 @@ export function HomePage({
   const upcomingAppointments = appointments.filter(apt => apt.status === 'upcoming');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white pb-20">
+    <div className="bg-gradient-to-b from-cyan-50 to-white pb-20 max-w-screen min-h-screen overflow-x-hidden">
       {/* Header avec logo et profil */}
-      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 px-6 pt-8 pb-6 rounded-b-3xl shadow-lg">
+      <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 shadow-lg px-4 sm:px-6 pt-8 pb-6 rounded-b-3xl w-full">
         {/* Logo */}
         <div className="mb-6">
           <Logo size="md" variant="white" />
         </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4 flex-1">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-1 items-center gap-4 min-w-0">
             <button onClick={user ? onNavigateToProfile : onLogin}>
-              <div className="w-16 h-16 rounded-full bg-white overflow-hidden ring-4 ring-white/30 hover:ring-white/50 transition-all">
+              <div className="flex-shrink-0 bg-white rounded-full ring-4 ring-white/30 hover:ring-white/50 w-14 sm:w-16 h-14 sm:h-16 overflow-hidden transition-all">
                 {user?.photo ? (
                   <img src={user.photo} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-400 to-purple-500">
-                    <User className="w-8 h-8 text-white" />
+                  <div className="flex justify-center items-center bg-gradient-to-br from-cyan-400 to-purple-500 w-full h-full">
+                    <User className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
                   </div>
                 )}
               </div>
             </button>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {user ? (
                 <>
-                  <p className="text-white/90 text-sm">Bonjour,</p>
-                  <p className="text-white">{user.prenom} {user.nom}</p>
+                  <p className="font-medium text-white/90 text-sm sm:text-base truncate">Bonjour,</p>
+                  <p className="font-semibold text-white text-lg sm:text-xl truncate">{user.prenom} {user.nom}</p>
                 </>
               ) : (
                 <>
-                  <p className="text-white/90 text-sm">Bienvenue sur</p>
-                  <p className="text-white">Ma Santé</p>
+                  <p className="font-medium text-white/90 text-sm sm:text-base">Bienvenue sur</p>
+                  <p className="font-semibold text-white text-lg sm:text-xl">Ma Santé</p>
                 </>
               )}
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex flex-shrink-0 items-center gap-2">
             {user ? (
               <>
                 <button
                   onClick={onNavigateToNotifications}
-                  className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors backdrop-blur-sm relative"
+                  className="relative flex justify-center items-center bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full w-8 sm:w-10 h-8 sm:h-10 transition-colors"
                 >
-                  <Bell className="w-5 h-5 text-white" />
-                  <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                  <Bell className="w-4 sm:w-5 h-4 sm:h-5 text-white" />
+                  <span className="top-1 right-1 absolute bg-red-500 border-2 border-white rounded-full w-3 h-3"></span>
                 </button>
                 <button
                   onClick={onLogout}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-sm text-sm"
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-2 rounded-full text-white text-xs sm:text-sm transition-colors"
                 >
                   Déconnexion
                 </button>
@@ -144,13 +146,13 @@ export function HomePage({
               <>
                 <button
                   onClick={onLogin}
-                  className="px-4 py-2 bg-white text-cyan-600 rounded-full hover:bg-white/90 transition-colors"
+                  className="bg-white hover:bg-white/90 px-3 sm:px-4 py-2 sm:py-2 rounded-full text-cyan-600 text-xs sm:text-sm transition-colors"
                 >
                   Connexion
                 </button>
                 <button
                   onClick={onSignup}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors backdrop-blur-sm"
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-2 rounded-full text-white text-xs sm:text-sm transition-colors"
                 >
                   Inscription
                 </button>
@@ -160,36 +162,36 @@ export function HomePage({
         </div>
 
         {/* Menus principaux */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
+        <div className="gap-3 sm:gap-4 grid grid-cols-2 mt-6">
           <button
             onClick={onNavigateToPharmacy}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95"
+            className="bg-white shadow-lg hover:shadow-xl p-4 sm:p-6 rounded-xl sm:rounded-2xl active:scale-95 transition-all"
           >
-            <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-teal-600 rounded-xl flex items-center justify-center mb-3 mx-auto">
-              <Pill className="w-7 h-7 text-white" />
+            <div className="flex justify-center items-center bg-gradient-to-br from-cyan-400 to-teal-600 mx-auto mb-2 sm:mb-3 rounded-lg sm:rounded-xl w-12 sm:w-14 h-12 sm:h-14">
+              <Pill className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
             </div>
-            <p className="text-gray-800 text-center">Pharmacie</p>
-            <p className="text-gray-500 text-sm text-center mt-1">Rechercher un médicament</p>
+            <p className="text-gray-800 text-sm sm:text-base text-center">Pharmacie</p>
+            <p className="mt-1 text-gray-500 text-xs sm:text-sm text-center">Rechercher un médicament</p>
           </button>
 
           <button
             onClick={onNavigateToConsultation}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95"
+            className="bg-white shadow-lg hover:shadow-xl p-4 sm:p-6 rounded-xl sm:rounded-2xl active:scale-95 transition-all"
           >
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-xl flex items-center justify-center mb-3 mx-auto">
-              <Stethoscope className="w-7 h-7 text-white" />
+            <div className="flex justify-center items-center bg-gradient-to-br from-purple-400 to-indigo-600 mx-auto mb-2 sm:mb-3 rounded-lg sm:rounded-xl w-12 sm:w-14 h-12 sm:h-14">
+              <Stethoscope className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
             </div>
-            <p className="text-gray-800 text-center">Consultation</p>
-            <p className="text-gray-500 text-sm text-center mt-1">Prendre rendez-vous</p>
+            <p className="text-gray-800 text-sm sm:text-base text-center">Consultation</p>
+            <p className="mt-1 text-gray-500 text-xs sm:text-sm text-center">Prendre rendez-vous</p>
           </button>
         </div>
       </div>
 
       {/* Prochains rendez-vous */}
       {user && upcomingAppointments.length > 0 && (
-        <div className="px-6 mt-6">
-          <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 rounded-2xl p-5 shadow-lg">
-            <div className="flex items-center justify-between mb-3">
+        <div className="mt-6 px-6">
+          <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 shadow-lg p-5 rounded-2xl">
+            <div className="flex justify-between items-center mb-3">
               <h3 className="text-white">Prochain rendez-vous</h3>
               <button 
                 onClick={onNavigateToHistory}
@@ -199,12 +201,12 @@ export function HomePage({
               </button>
             </div>
             {upcomingAppointments.slice(0, 1).map((apt) => (
-              <div key={apt.id} className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+              <div key={apt.id} className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <img
                     src={apt.professional.image}
                     alt={apt.professional.name}
-                    className="w-12 h-12 rounded-lg object-cover ring-2 ring-white/30"
+                    className="rounded-lg ring-2 ring-white/30 w-12 h-12 object-cover"
                   />
                   <div className="flex-1">
                     <p className="text-white">{apt.professional.name}</p>
@@ -229,13 +231,13 @@ export function HomePage({
 
       {/* Menu rapide */}
       {user && (
-        <div className="px-6 mt-6">
-          <div className="grid grid-cols-4 gap-3">
+        <div className="mt-6 px-6">
+          <div className="gap-3 grid grid-cols-4">
             <button
               onClick={onNavigateToProfile}
-              className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all active:scale-95"
+              className="bg-white shadow-md hover:shadow-lg p-4 rounded-xl active:scale-95 transition-all"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <div className="flex justify-center items-center bg-gradient-to-br from-purple-400 to-purple-600 mx-auto mb-2 rounded-lg w-10 h-10">
                 <User className="w-5 h-5 text-white" />
               </div>
               <p className="text-gray-700 text-sm text-center">Profil</p>
@@ -243,9 +245,9 @@ export function HomePage({
 
             <button
               onClick={onNavigateToHistory}
-              className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all active:scale-95"
+              className="bg-white shadow-md hover:shadow-lg p-4 rounded-xl active:scale-95 transition-all"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <div className="flex justify-center items-center bg-gradient-to-br from-orange-400 to-orange-600 mx-auto mb-2 rounded-lg w-10 h-10">
                 <History className="w-5 h-5 text-white" />
               </div>
               <p className="text-gray-700 text-sm text-center">Historique</p>
@@ -253,9 +255,9 @@ export function HomePage({
 
             <button
               onClick={onNavigateToWallet}
-              className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all active:scale-95"
+              className="bg-white shadow-md hover:shadow-lg p-4 rounded-xl active:scale-95 transition-all"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <div className="flex justify-center items-center bg-gradient-to-br from-green-400 to-green-600 mx-auto mb-2 rounded-lg w-10 h-10">
                 <Wallet className="w-5 h-5 text-white" />
               </div>
               <p className="text-gray-700 text-sm text-center">Porte­feuille</p>
@@ -263,40 +265,55 @@ export function HomePage({
 
             <button
               onClick={onNavigateToNotifications}
-              className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all active:scale-95 relative"
+              className="relative bg-white shadow-md hover:shadow-lg p-4 rounded-xl active:scale-95 transition-all"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <div className="flex justify-center items-center bg-gradient-to-br from-red-400 to-red-600 mx-auto mb-2 rounded-lg w-10 h-10">
                 <Bell className="w-5 h-5 text-white" />
               </div>
               <p className="text-gray-700 text-sm text-center">Alertes</p>
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="top-2 right-2 absolute bg-red-500 rounded-full w-2 h-2"></span>
             </button>
           </div>
+
+          {/* Bouton d'accès admin caché */}
+          {onNavigateToAdminAccess && (
+            <div className="mt-4">
+              <button
+                onClick={onNavigateToAdminAccess}
+                className="bg-gray-800 hover:bg-gray-900 opacity-50 hover:opacity-100 p-3 rounded-xl w-full text-white text-xs transition-colors"
+              >
+                Accès Admin
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* Pharmacies de Garde (accessible à tous) */}
-      <div className="px-6 mt-6">
+      <div className="mt-6 px-6">
         <button
           onClick={onNavigateToOnDutyPharmacies}
-          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-4"
+          className="flex items-center gap-4 bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl p-5 rounded-2xl w-full active:scale-95 transition-all"
         >
-          <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+          <div className="flex justify-center items-center bg-white/20 backdrop-blur-sm rounded-xl w-14 h-14">
             <Shield className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1 text-left">
             <p className="text-white">Pharmacies de Garde</p>
-            <p className="text-white/80 text-sm mt-1">Ouvertes 24h/24</p>
+            <p className="mt-1 text-white/80 text-sm">Ouvertes 24h/24</p>
           </div>
           <ChevronRight className="w-6 h-6 text-white" />
         </button>
       </div>
 
       {/* Section Cliniques et CMS */}
-      <div className="px-6 mt-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mt-8 px-6">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-gray-800">Cliniques & Centres Médicaux</h2>
-          <button className="text-purple-600 text-sm flex items-center gap-1">
+          <button 
+            onClick={onNavigateToConsultation}
+            className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm transition-colors"
+          >
             Voir tout
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -306,16 +323,16 @@ export function HomePage({
           {doctors.map((doctor, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl shadow-md p-4 flex items-center gap-4 hover:shadow-lg transition-shadow"
+              className="flex items-center gap-4 bg-white shadow-md hover:shadow-lg p-4 rounded-2xl transition-shadow"
             >
               <img
                 src={doctor.image}
                 alt={doctor.name}
-                className="w-20 h-20 rounded-xl object-cover"
+                className="rounded-xl w-20 h-20 object-cover"
               />
               <div className="flex-1">
-                <h3 className="text-gray-800 mb-1">{doctor.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{doctor.specialty}</p>
+                <h3 className="mb-1 text-gray-800">{doctor.name}</h3>
+                <p className="mb-2 text-gray-600 text-sm">{doctor.specialty}</p>
                 {doctor.available ? (
                   <div className="flex items-center gap-1 text-cyan-600 text-sm">
                     <Clock className="w-4 h-4" />
@@ -330,7 +347,7 @@ export function HomePage({
               </div>
               <button 
                 onClick={onNavigateToConsultation}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 text-white rounded-full hover:shadow-md transition-shadow"
+                className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 hover:shadow-md px-4 py-2 rounded-full text-white transition-shadow"
               >
                 Consulter
               </button>
@@ -341,10 +358,10 @@ export function HomePage({
 
       {/* Prompt d'authentification */}
       {showAuthPrompt && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 px-6">
+          <div className="bg-white shadow-2xl p-8 rounded-3xl w-full max-w-sm animate-in duration-200 fade-in zoom-in">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl flex items-center justify-center">
+              <div className="flex justify-center items-center bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl w-16 h-16">
                 <User className="w-8 h-8 text-white" />
               </div>
               <button
@@ -354,8 +371,8 @@ export function HomePage({
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <h3 className="text-gray-800 mb-2">Connexion requise</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="mb-2 text-gray-800">Connexion requise</h3>
+            <p className="mb-6 text-gray-600">
               Veuillez vous connecter ou créer un compte pour accéder à cette fonctionnalité.
             </p>
             <div className="flex gap-3">
@@ -364,7 +381,7 @@ export function HomePage({
                   onAuthPromptClose();
                   onLogin();
                 }}
-                className="flex-1 py-3 bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-shadow"
+                className="flex-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 hover:shadow-lg py-3 rounded-xl text-white transition-shadow"
               >
                 Se connecter
               </button>
@@ -373,7 +390,7 @@ export function HomePage({
                   onAuthPromptClose();
                   onSignup();
                 }}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                className="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl text-gray-700 transition-colors"
               >
                 S'inscrire
               </button>

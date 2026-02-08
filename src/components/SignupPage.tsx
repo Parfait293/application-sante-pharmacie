@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, User, Phone, Briefcase, Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import type { User as UserType } from '../types';
-import { USER_PROFESSIONS } from '../types';
+import { USER_PROFESSIONS, HEALTH_PROFESSIONS, WEST_AFRICA_COUNTRIES } from '../types';
 import { Logo } from './Logo';
 import { authAPI } from '../utils/api';
 
@@ -22,6 +22,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(WEST_AFRICA_COUNTRIES[0]); // Togo par défaut
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +34,20 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
   const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password && password === confirmPassword) {
+      // Validation du mot de passe : minimum 8 caractères sans contrainte spécifique
+      if (password.length < 8) {
+        alert('Le mot de passe doit contenir au moins 8 caractères');
+        return;
+      }
+      
+      // Construire le numéro de téléphone complet avec le préfixe pays
+      const fullTelephone = `${selectedCountry.code}${telephone.replace(/\s/g, '')}`;
+      
       try {
         const result = await authAPI.register({
           nom,
           prenom,
-          telephone,
+          telephone: fullTelephone,
           profession,
           email: email || undefined,
           password
@@ -58,41 +68,41 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
   const passwordLength = password.length >= 8;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white pb-10">
+    <div className="bg-gradient-to-b from-cyan-50 to-white pb-10 min-h-screen">
       {/* Header */}
       <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 px-6 pt-8 pb-24 rounded-b-[3rem]">
         <button
           onClick={step === 2 ? () => setStep(1) : onBack}
-          className="text-white flex items-center gap-2 mb-8"
+          className="flex items-center gap-2 mb-8 text-white"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Retour</span>
         </button>
         <Logo size="md" variant="white" />
-        <h1 className="text-white text-3xl mb-2 mt-6">Créer un compte</h1>
+        <h1 className="mt-6 mb-2 text-white text-3xl">Créer un compte</h1>
         <p className="text-white/80">
           {step === 1 ? 'Étape 1/2 : Informations personnelles' : 'Étape 2/2 : Sécurité'}
         </p>
 
         {/* Progress */}
         <div className="flex gap-2 mt-6">
-          <div className="flex-1 h-1 bg-white rounded-full"></div>
+          <div className="flex-1 bg-white rounded-full h-1"></div>
           <div className={`flex-1 h-1 rounded-full ${step === 2 ? 'bg-white' : 'bg-white/30'}`}></div>
         </div>
       </div>
 
       {/* Form */}
-      <div className="px-6 -mt-16">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+      <div className="-mt-16 px-6">
+        <div className="bg-white shadow-xl p-8 rounded-3xl">
           {step === 1 ? (
             <form onSubmit={handleStep1Submit} className="space-y-5">
               {/* Nom */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Nom <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                     <User className="w-5 h-5" />
                   </div>
                   <input
@@ -100,7 +110,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                     value={nom}
                     onChange={(e) => setNom(e.target.value)}
                     placeholder="Votre nom"
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
                     required
                   />
                 </div>
@@ -108,11 +118,11 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
 
               {/* Prénom */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Prénom <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                     <User className="w-5 h-5" />
                   </div>
                   <input
@@ -120,7 +130,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                     value={prenom}
                     onChange={(e) => setPrenom(e.target.value)}
                     placeholder="Votre prénom"
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                    className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-green-500 rounded-xl focus:outline-none w-full transition-colors"
                     required
                   />
                 </div>
@@ -128,56 +138,84 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
 
               {/* Téléphone */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Numéro de téléphone <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                    <Phone className="w-5 h-5" />
+                <div className="flex gap-2">
+                  {/* Sélecteur de pays */}
+                  <select
+                    value={selectedCountry.code}
+                    onChange={(e) => {
+                      const country = WEST_AFRICA_COUNTRIES.find(c => c.code === e.target.value);
+                      if (country) setSelectedCountry(country);
+                    }}
+                    className="bg-white px-3 py-4 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none transition-colors appearance-none"
+                  >
+                    {WEST_AFRICA_COUNTRIES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.code}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  {/* Input du numéro de téléphone */}
+                  <div className="relative flex-1">
+                    <div className="top-1/2 left-4 z-10 absolute text-gray-400 -translate-y-1/2 pointer-events-none">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="tel"
+                      value={telephone}
+                      onChange={(e) => setTelephone(e.target.value)}
+                      placeholder="90 06 00 15"
+                      className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
+                      required
+                    />
                   </div>
-                  <input
-                    type="tel"
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
-                    placeholder="+228 90123456"
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                    required
-                  />
                 </div>
               </div>
 
               {/* Profession */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Profession <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                  <div className="top-1/2 left-4 z-10 absolute text-gray-400 -translate-y-1/2 pointer-events-none">
                     <Briefcase className="w-5 h-5" />
                   </div>
                   <select
                     value={profession}
                     onChange={(e) => setProfession(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors appearance-none bg-white"
+                    className="bg-white py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-green-500 rounded-xl focus:outline-none w-full transition-colors appearance-none"
                     required
                   >
                     <option value="">Sélectionnez votre profession</option>
-                    {USER_PROFESSIONS.map((prof) => (
-                      <option key={prof} value={prof}>
-                        {prof}
-                      </option>
-                    ))}
+                    <optgroup label="Professions de santé">
+                      {HEALTH_PROFESSIONS.map((prof) => (
+                        <option key={prof} value={prof}>
+                          {prof}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Autres professions">
+                      {USER_PROFESSIONS.map((prof) => (
+                        <option key={prof} value={prof}>
+                          {prof}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
               </div>
 
               {/* Email (optionnel) */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Email <span className="text-gray-400 text-sm">(optionnel)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                     <Mail className="w-5 h-5" />
                   </div>
                   <input
@@ -185,7 +223,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="exemple@email.com"
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
                   />
                 </div>
               </div>
@@ -193,7 +231,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-shadow mt-6"
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:shadow-lg mt-6 py-4 rounded-xl w-full text-white transition-shadow"
               >
                 Continuer
               </button>
@@ -202,11 +240,11 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
             <form onSubmit={handleStep2Submit} className="space-y-5">
               {/* Password */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Mot de passe <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                     <Lock className="w-5 h-5" />
                   </div>
                   <input
@@ -214,13 +252,13 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 8 caractères"
-                    className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    className="py-4 pr-12 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="top-1/2 right-4 absolute text-gray-400 hover:text-gray-600 -translate-y-1/2"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -230,11 +268,11 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                   </button>
                 </div>
                 {/* Password requirements */}
-                <div className="mt-2 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 mt-2 text-sm">
                   {passwordLength ? (
                     <Check className="w-4 h-4 text-cyan-500" />
                   ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-gray-300"></div>
+                    <div className="border-2 border-gray-300 rounded-full w-4 h-4"></div>
                   )}
                   <span className={passwordLength ? 'text-cyan-600' : 'text-gray-500'}>
                     Au moins 8 caractères
@@ -244,11 +282,11 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block mb-2 text-gray-700">
                   Confirmer le mot de passe <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                     <Lock className="w-5 h-5" />
                   </div>
                   <input
@@ -256,13 +294,13 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirmez votre mot de passe"
-                    className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    className="py-4 pr-12 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="top-1/2 right-4 absolute text-gray-400 hover:text-gray-600 -translate-y-1/2"
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -272,7 +310,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                   </button>
                 </div>
                 {confirmPassword && (
-                  <div className="mt-2 flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 mt-2 text-sm">
                     {passwordsMatch ? (
                       <>
                         <Check className="w-4 h-4 text-cyan-500" />
@@ -280,7 +318,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
                       </>
                     ) : (
                       <>
-                        <div className="w-4 h-4 rounded-full border-2 border-red-300"></div>
+                        <div className="border-2 border-red-300 rounded-full w-4 h-4"></div>
                         <span className="text-red-500">Les mots de passe ne correspondent pas</span>
                       </>
                     )}
@@ -292,7 +330,7 @@ export function SignupPage({ onSignup, onNavigateToLogin, onBack }: SignupPagePr
               <button
                 type="submit"
                 disabled={!passwordsMatch || !passwordLength}
-                className="w-full py-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-shadow mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-green-500 to-blue-600 disabled:opacity-50 hover:shadow-lg mt-6 py-4 rounded-xl w-full text-white transition-shadow disabled:cursor-not-allowed"
               >
                 Créer mon compte
               </button>

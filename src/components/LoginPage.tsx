@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Mail, Phone, Lock, Eye, EyeOff } from 'lucide-react';
 import { Logo } from './Logo';
 import { authAPI } from '../utils/api';
+import { WEST_AFRICA_COUNTRIES } from '../types';
 
 type LoginPageProps = {
   onLogin: (identifier: string, password: string) => void;
@@ -14,46 +15,47 @@ export function LoginPage({ onLogin, onNavigateToSignup, onBack }: LoginPageProp
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [usePhone, setUsePhone] = useState(true);
+  const [selectedCountry, setSelectedCountry] = useState(WEST_AFRICA_COUNTRIES[0]); // Togo par défaut
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (identifier && password) {
-      try {
-        const result = await authAPI.login({ identifier, password });
-        if (result.user) {
-          onLogin(result.user, result.token);
-        } else {
-          alert(result.message || 'Erreur de connexion');
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        alert('Erreur de connexion');
+      // Validation du mot de passe : minimum 8 caractères sans contrainte spécifique
+      if (password.length < 8) {
+        alert('Le mot de passe doit contenir au moins 8 caractères');
+        return;
       }
+      
+      // Construire l'identifiant complet avec le préfixe pays si téléphone
+      const fullIdentifier = usePhone ? `${selectedCountry.code}${identifier.replace(/\s/g, '')}` : identifier;
+      
+      // Appeler la fonction onLogin avec l'identifiant et le mot de passe
+      onLogin(fullIdentifier, password);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white">
+    <div className="bg-gradient-to-b from-cyan-50 to-white min-h-screen">
       {/* Header */}
       <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 px-6 pt-8 pb-24 rounded-b-[3rem]">
         <button
           onClick={onBack}
-          className="text-white flex items-center gap-2 mb-8"
+          className="flex items-center gap-2 mb-8 text-white"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Retour</span>
         </button>
         <Logo size="md" variant="white" />
-        <h1 className="text-white text-3xl mb-2 mt-6">Bon retour !</h1>
+        <h1 className="mt-6 mb-2 text-white text-3xl">Bon retour !</h1>
         <p className="text-white/80">Connectez-vous pour continuer</p>
       </div>
 
       {/* Form */}
-      <div className="px-6 -mt-16">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+      <div className="-mt-16 px-6">
+        <div className="bg-white shadow-xl p-8 rounded-3xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Toggle Phone/Email */}
-            <div className="flex gap-2 bg-gray-100 rounded-xl p-1">
+            <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
               <button
                 type="button"
                 onClick={() => setUsePhone(true)}
@@ -63,7 +65,7 @@ export function LoginPage({ onLogin, onNavigateToSignup, onBack }: LoginPageProp
                     : 'text-gray-600'
                 }`}
               >
-                <Phone className="w-5 h-5 mx-auto mb-1" />
+                <Phone className="mx-auto mb-1 w-5 h-5" />
                 <span className="text-sm">Téléphone</span>
               </button>
               <button
@@ -75,42 +77,73 @@ export function LoginPage({ onLogin, onNavigateToSignup, onBack }: LoginPageProp
                     : 'text-gray-600'
                 }`}
               >
-                <Mail className="w-5 h-5 mx-auto mb-1" />
+                <Mail className="mx-auto mb-1 w-5 h-5" />
                 <span className="text-sm">Email</span>
               </button>
             </div>
 
             {/* Identifier Input */}
             <div>
-              <label className="block text-gray-700 mb-2">
+              <label className="block mb-2 text-gray-700">
                 {usePhone ? 'Numéro de téléphone' : 'Adresse email'}
               </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  {usePhone ? (
-                    <Phone className="w-5 h-5" />
-                  ) : (
-                    <Mail className="w-5 h-5" />
-                  )}
+              {usePhone ? (
+                <div className="flex gap-2">
+                  {/* Sélecteur de pays */}
+                  <select
+                    value={selectedCountry.code}
+                    onChange={(e) => {
+                      const country = WEST_AFRICA_COUNTRIES.find(c => c.code === e.target.value);
+                      if (country) setSelectedCountry(country);
+                    }}
+                    className="bg-white px-3 py-4 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none transition-colors appearance-none"
+                  >
+                    {WEST_AFRICA_COUNTRIES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.code}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  {/* Input du numéro de téléphone */}
+                  <div className="relative flex-1">
+                    <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="tel"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      placeholder="90 06 00 15"
+                      className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
+                      required
+                    />
+                  </div>
                 </div>
-                <input
-                  type={usePhone ? 'tel' : 'email'}
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={usePhone ? '+228 90 06 00 15' : 'exemple@email.com'}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                  required
-                />
-              </div>
+              ) : (
+                <div className="relative">
+                  <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="email"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="exemple@email.com"
+                    className="py-4 pr-4 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
+                    required
+                  />
+                </div>
+              )}
             </div>
 
             {/* Password Input */}
             <div>
-              <label className="block text-gray-700 mb-2">
+              <label className="block mb-2 text-gray-700">
                 Mot de passe
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <div className="top-1/2 left-4 absolute text-gray-400 -translate-y-1/2">
                   <Lock className="w-5 h-5" />
                 </div>
                 <input
@@ -118,13 +151,13 @@ export function LoginPage({ onLogin, onNavigateToSignup, onBack }: LoginPageProp
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Votre mot de passe"
-                  className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                  className="py-4 pr-12 pl-12 border-2 border-gray-200 focus:border-cyan-500 rounded-xl focus:outline-none w-full transition-colors"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="top-1/2 right-4 absolute text-gray-400 hover:text-gray-600 -translate-y-1/2"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -148,7 +181,7 @@ export function LoginPage({ onLogin, onNavigateToSignup, onBack }: LoginPageProp
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-shadow"
+              className="bg-gradient-to-r from-cyan-500 via-teal-500 to-purple-600 hover:shadow-lg py-4 rounded-xl w-full text-white transition-shadow"
             >
               Se connecter
             </button>

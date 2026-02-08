@@ -1,6 +1,6 @@
 // Utilitaires API pour connecter le frontend au backend
 
-const API_BASE_URL = 'http://192.168.137.5:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // Fonction utilitaire pour obtenir le jeton d'authentification
 const getToken = () => localStorage.getItem('token');

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HomePage } from './components/HomePage';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
@@ -16,6 +16,7 @@ import { ProfessionalAppointmentsPage } from './components/ProfessionalAppointme
 import { ProfessionalWalletPage } from './components/ProfessionalWalletPage';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AdminUsersPage } from './components/AdminUsersPage';
+import { authAPI } from './utils/api';
 import type { User, Appointment, Order, Professional } from './types';
 
 export default function App() {
@@ -25,6 +26,60 @@ export default function App() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
+  // Gestion du bouton retour du téléphone
+  useEffect(() => {
+    const handleBackButton = (event: PopStateEvent) => {
+      event.preventDefault();
+      
+      // Logique de navigation retour
+      if (currentPage !== 'home') {
+        // Déterminer la page de retour en fonction de la page actuelle
+        switch (currentPage) {
+          case 'login':
+          case 'signup':
+          case 'professional-signup':
+          case 'admin-access':
+          case 'on-duty-pharmacies':
+            setCurrentPage('home');
+            break;
+          case 'pharmacy':
+          case 'consultation':
+          case 'profile':
+          case 'history':
+          case 'notifications':
+          case 'wallet':
+            setCurrentPage('home');
+            break;
+          case 'admin-dashboard':
+            setCurrentPage('home');
+            break;
+          case 'admin-users':
+            setCurrentPage('admin-dashboard');
+            break;
+          case 'professional-dashboard':
+            setCurrentPage('home');
+            break;
+          case 'professional-appointments':
+          case 'professional-wallet':
+            setCurrentPage('professional-dashboard');
+            break;
+          default:
+            setCurrentPage('home');
+        }
+      }
+    };
+
+    // Ajouter un état à l'historique pour pouvoir gérer le retour
+    window.history.pushState({ page: currentPage }, '', window.location.href);
+    
+    // Écouter l'événement de retour
+    window.addEventListener('popstate', handleBackButton);
+    
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [currentPage]);
+
   const handleLogout = () => {
     setUser(null);
     setCurrentPage('home');
@@ -33,17 +88,27 @@ export default function App() {
     localStorage.removeItem('token');
   };
 
-  const handleLogin = (userData: User, token?: string) => {
-    setUser(userData);
-    // Rediriger selon le rôle de l'utilisateur
-    if (userData.role === 'admin') {
-      setCurrentPage('admin-dashboard');
-    } else if (userData.role === 'professional' && userData.professionalProfile) {
-      setCurrentPage('professional-dashboard');
-    } else {
-      setCurrentPage('home');
+  const handleLogin = async (identifier: string, password: string) => {
+    try {
+      const result = await authAPI.login({ identifier, password });
+      if (result.user) {
+        setUser(result.user);
+        // Rediriger selon le rôle de l'utilisateur
+        if (result.user.role === 'admin') {
+          setCurrentPage('admin-dashboard');
+        } else if (result.user.role === 'professional' && result.user.professionalProfile) {
+          setCurrentPage('professional-dashboard');
+        } else {
+          setCurrentPage('home');
+        }
+        // Le jeton est stocké dans localStorage par l'API
+      } else {
+        alert(result.message || 'Erreur de connexion');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Erreur de connexion');
     }
-    // Le jeton est stocké dans localStorage par l'API
   };
 
   const handleSignup = (userData: User, password: string) => {
@@ -60,6 +125,22 @@ export default function App() {
 
   const handleUpdateUser = (updatedUser: User) => {
     setUser(updatedUser);
+  };
+
+  const handleAdminLogin = async (user: User) => {
+    setUser(user);
+    // Rediriger selon le rôle de l'utilisateur
+    if (user.role === 'admin') {
+      setCurrentPage('admin-dashboard');
+    } else if (user.role === 'professional' && user.professionalProfile) {
+      setCurrentPage('professional-dashboard');
+    } else {
+      setCurrentPage('home');
+    }
+  };
+
+  const handleNavigateToAdminAccess = () => {
+    setCurrentPage('admin-access');
   };
 
   const handleNavigateToPharmacy = () => {
@@ -103,6 +184,7 @@ export default function App() {
           onNavigateToNotifications={() => setCurrentPage('notifications')}
           onNavigateToWallet={() => setCurrentPage('wallet')}
           onNavigateToOnDutyPharmacies={() => setCurrentPage('on-duty-pharmacies')}
+          onNavigateToAdminAccess={handleNavigateToAdminAccess}
           showAuthPrompt={showAuthPrompt}
           onAuthPromptClose={() => setShowAuthPrompt(false)}
           appointments={appointments}
@@ -126,7 +208,6 @@ export default function App() {
         <PharmacyPage
           user={user}
           onBack={() => setCurrentPage('home')}
-          onAddOrder={handleAddOrder}
         />
       )}
       {currentPage === 'consultation' && user && (
@@ -218,7 +299,7 @@ export default function App() {
       )}
       {currentPage === 'admin-access' && (
         <AdminAccessPage
-          onAdminLogin={handleLogin}
+          onAdminLogin={handleAdminLogin}
           onBack={() => setCurrentPage('home')}
         />
       )}
